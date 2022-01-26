@@ -1,0 +1,64 @@
+---
+title: "TRES Nesting Success vs. Precipitation"
+author: "Conor McMahon"
+date: "1/26/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(here)
+```
+
+```{r}
+
+# Load Data
+bird_data <- read_csv(here::here("..","annual_data.csv"))
+names(bird_data) <- c("year","precipitation","SPEI_1","SPEI_2","SPEI_3","SPEI_4","SPEI_5","SPEI_6",
+                      "tres_total_fledged","tres_fledged_per_box","tres_fledging_efficiency","webl_total_fledged","webl_fledged_per_box","webl_fledging_efficiency")
+bird_data$tres_fledging_efficiency <- as.numeric(substr(bird_data$tres_fledging_efficiency, 1,2))
+bird_data$webl_fledging_efficiency <- as.numeric(substr(bird_data$webl_fledging_efficiency, 1,2))
+
+# Generate Basic Plots
+ggplot(bird_data) + 
+  geom_point(aes(x=precipitation, y=tres_total_fledged)) + 
+  xlab("Annual Precipitation") + 
+  ylab("TRES Total Fledged")
+
+ggplot(bird_data) + 
+  geom_point(aes(x=precipitation, y=webl_total_fledged)) + 
+  xlab("Annual Precipitation") + 
+  ylab("WEBL Total Fledged")
+
+ggplot(bird_data) + 
+  geom_point(aes(x=precipitation, y=tres_fledged_per_box)) + 
+  xlab("Annual Precipitation") + 
+  ylab("TRES Fledged per Box")
+
+ggplot(bird_data) + 
+  geom_point(aes(x=precipitation, y=webl_fledged_per_box)) + 
+  xlab("Annual Precipitation") + 
+  ylab("WEBL Fledged per Box")
+
+
+```
+
+Summary statistics on the effects of drought on TRES:
+
+```{r}
+
+# Fledged Total
+tres_ft_precip <- lm(tres_total_fledged~precipitation+SPEI_3, data=bird_data)
+summary(tres_ft_precip)
+
+
+# Fledging Efficiency
+tres_fe_precip <- lm(tres_fledging_efficiency~precipitation+SPEI_3, data=bird_data)
+summary(tres_fe_precip)
+
+
+```
